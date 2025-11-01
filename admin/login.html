@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>后台登录</title>
+  <link rel="stylesheet" href="./assets/admin.css" />
+</head>
+<body class="auth-body">
+  <main class="auth-container">
+    <section class="auth-card" aria-labelledby="login-title">
+      <h1 id="login-title">后台管理系统登录</h1>
+      <p class="muted">默认账号密码均为 <strong>admin</strong></p>
+
+      <form id="login-form" novalidate>
+        <div class="form-field">
+          <label for="username">用户名</label>
+          <input id="username" name="username" type="text" autocomplete="username" required placeholder="admin" />
+          <div class="field-error" data-for="username"></div>
+        </div>
+        <div class="form-field">
+          <label for="password">密码</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required placeholder="••••••" />
+          <div class="field-error" data-for="password"></div>
+        </div>
+        <input type="hidden" id="csrf_token" name="csrf_token" />
+
+        <button type="submit" id="login-btn" class="btn primary" disabled>
+          <span class="btn-text">登录</span>
+          <span class="btn-loading" aria-hidden="true"></span>
+        </button>
+      </form>
+
+      <div id="form-error" class="form-error" role="alert" aria-live="polite"></div>
+    </section>
+  </main>
+
+  <script>
+    const state = { csrf: '', loading: false };
+
+    function setLoading(loading) {
+      state.loading = loading;
+      const btn = document.getElementById('login-btn');
+      btn.classList.toggle('loading', loading);
+      btn.disabled = loading;
+    }
+
+    function setFormEnabled(enabled) {
+      document.getElementById('login-btn').disabled = !enabled || state.loading;
+    }
+
+    function showFieldError(field, msg) {
+      const el = document.querySelector(`.field-error[data-for="${field}"]`);
+      if (el) el.textContent = msg || '';
+    }
+
+    function showFormError(msg) {
+      const el = document.getElementById('form-error');
+      el.textContent = msg || '';
+    }
+
+    async function fetchStatus() {
+      const res = await fetch('./index.php?action=status', { credentials: 'same-origin' });
+      const data = await res.json();
+      state.csrf = data.csrf_token || '';
+      document.getElementById('csrf_token').value = state.csrf;
+      // 已登录则跳转
+      if (data.logged_in) {
+        window.location.href = './dashboard.html';
+        return;
+      }
+      setFormEnabled(true);
+    }
+
+    async function doLogin(username, password) {
+      const res = await fetch('./index.php?action=login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'same-origin',
+        body: JSON.stringify({ username, password, csrf_token: state.csrf })
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      return data;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      fetchStatus().catch(() => setFormEnabled(true));
+
+      const form = document.getElementById('login-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        showFormError('');
+        showFieldError('username', '');
+        showFieldError('password', '');
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+
+        let hasError = false;
+        if (!username) { showFieldError('username', '请输入用户名'); hasError = true; }
+        if (!password) { showFieldError('password', '请输入密码'); hasError = true; }
+        if (hasError) return;
+
+        setLoading(true);
+        try {
+          await doLogin(username, password);
+          window.location.href = './dashboard.html';
+        } catch (err) {
+          showFormError(err.message || '登录失败，请稍后再试');
+        } finally {
+          setLoading(false);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

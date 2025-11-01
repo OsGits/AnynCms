@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>后台首页</title>
+  <link rel="stylesheet" href="./assets/admin.css" />
+  <link rel="stylesheet" href="./assets/modules/frontend.css" />
+  <link rel="stylesheet" href="./assets/modules/admin.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="brand">后台管理系统</div>
+    <nav class="nav">
+      <button id="logout-btn" class="btn">退出登录</button>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <aside class="sidebar">
+      <ul>
+        <li class="active">首页</li>
+        <li id="nav-frontend">前端</li>
+        <!-- 新增资源导航按钮 -->
+        <li id="nav-resource">资源</li>
+        <li id="nav-admin">密码</li>
+      </ul>
+    </aside>
+    <section class="content">
+      <section id="home-section" class="grid">
+        <div class="card clock-card">
+          <h2>系统时间</h2>
+          <div id="clock" class="clock">--/--/-- --:--:--</div>
+        </div>
+      </section>
+
+      <section id="frontend-section" class="grid hidden">
+        <div class="card">
+          <h2>说明：</h2>
+          <p class="muted">
+            网站名称：用于显示在浏览器标题栏和页面头部。<br>
+            网站关键字：用于搜索引擎优化，建议不超过 200 字符。<br>
+            网站描述：用于搜索引擎摘要展示，建议不超过 300 字符。<br>
+            选择模板：从下拉列表中选择要应用的前端模板。<br>
+          </p>
+        </div>
+        <div class="card">
+          <h2>前端模板</h2>
+          <div class="form-field">
+            <label for="site-name-input">网站名称</label>
+            <input id="site-name-input" type="text" placeholder="例如：我的网站" />
+            <div id="site-name-status" class="form-error" aria-live="polite"></div>
+          </div>
+          <div class="form-field">
+            <label for="site-keywords-input">网站关键字</label>
+            <input id="site-keywords-input" type="text" placeholder="例如：电影, 电视剧, 综艺" />
+            <div id="site-keywords-status" class="form-error" aria-live="polite"></div>
+            <div id="site-name-status" class="form-error" aria-live="polite"></div>
+          </div>
+          <div class="form-field">
+            <label for="site-description-input">网站描述</label>
+            <input id="site-description-input" type="text" placeholder="一句话描述站点用途" />
+            <div id="site-description-status" class="form-error" aria-live="polite"></div>
+            <div id="site-name-status" class="form-error" aria-live="polite"></div>
+          </div>
+          <div class="form-field select-row">
+            <label for="template-select">选择模板</label>
+            <div class="select-wrap">
+              <select id="template-select" class="select-control"></select>
+              <span class="select-arrow" aria-hidden="true">▾</span>
+            </div>
+            <div id="tpl-msg" class="form-error" aria-live="polite"></div>
+          </div>
+          <div class="form-actions">
+            <button id="save-template-btn" class="btn primary">
+              <span class="btn-text">保存</span>
+              <span class="btn-loading" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>        
+      </section>
+
+      <!-- 新增：资源导航内容，仅UI -->
+      <section id="resource-section" class="grid hidden">
+        <div class="card">
+          <h2>说明：</h2>
+          <p class="muted">
+            1. 请确保填写的资源 Json 接口地址是正确的，否则会导致资源加载失败。<br>
+            2. M3u8 播放器地址请填写完整，包含播放参数占位符（如：<code>https://anyn.cc/m3u8/?url=</code>）。<br>
+            3. 保存配置后，前端页面会立即生效。
+          </p>
+        </div>
+        <div class="card">
+          <h2>资源配置</h2>
+          <div class="form-field">
+            <label for="resource-json-url">资源 Json 接口</label>
+            <input id="resource-json-url" type="text" placeholder="例如：https://cj.lziapi.com/api.php/provide/vod" />
+            <div class="form-error" aria-live="polite"></div>
+            
+          </div>
+          <div class="form-field">
+            <label for="m3u8-player-url">M3u8 播放器</label>
+            <input id="m3u8-player-url" type="text" placeholder="例如：https://anyn.cc/m3u8/?url=" />
+            <div class="form-error" aria-live="polite"></div>
+           
+          </div>
+          <div class="form-actions">
+            <button id="save-resource-btn" class="btn primary">
+              <span class="btn-text">保存</span>
+              <span class="btn-loading" aria-hidden="true"></span>
+            </button>
+          </div>
+        </div>        
+      </section>
+
+      <section id="admin-section" class="grid hidden">
+        <div class="card">
+          <h2>说明：</h2>
+          <p class="muted">
+            1. 为了保障账号安全，请及时修改默认密码。<br>
+            2. 新密码建议包含字母、数字和特殊字符，长度建议在 8-20 位之间。<br>
+            3. 如果密码忘记或无法登录，可手动修改\admin\u.php文件中的密码。
+          </p>
+        </div>
+        <div class="card">
+          <h2>修改密码</h2>
+          <form id="pwd-form" class="form-grid" novalidate>
+            <div class="form-field">
+              <label for="current_password">当前密码</label>
+              <input id="current_password" type="password" required />
+            </div>
+            <div class="form-field">
+              <label for="new_password">新密码</label>
+              <input id="new_password" type="password" required />
+            </div>
+            <button type="submit" class="btn primary"><span class="btn-text">更新密码</span></button>
+          </form>
+          <div id="pwd-msg" class="form-error" aria-live="polite"></div>
+        </div>        
+      </section>
+    </section>
+  </main>
+
+  <footer class="app-footer">© 后台管理系统</footer>
+
+  <script type="module" src="./assets/app.js"></script>
+</body>
+</html>
